@@ -4,15 +4,21 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --experimental-modules",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@prisma/client": "^5.11.0",
     "nuxt": "^3.11.1",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.11.0",
+    "vite-plugin-vuetify": "^2.0.3",
     "vuetify": "^3.5.12"
   }
 }

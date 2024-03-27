@@ -1,4 +1,7 @@
 version: '3.8'
+networks:
+    nuxtapp:
+        driver: bridge
 
 services:
   nuxtapp:
@@ -14,6 +17,8 @@ services:
       HOST: 0.0.0.0
     depends_on:
       - db
+    networks:
+        - nuxtapp
 
   db:
     image: mysql:latest
@@ -24,10 +29,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: nuxtforum
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
+    networks:
+        - nuxtapp
 
 volumes:
   db_data:
