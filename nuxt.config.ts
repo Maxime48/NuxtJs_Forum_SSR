@@ -1,6 +1,5 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-import wsServer from "#build/server/wsServer";
+import wsServer from './server/middleware/wsServer'
 export default defineNuxtConfig({
   devtools: { enabled: true },
   build: {
@@ -20,8 +19,5 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
-  },
-  serverMiddleware: [
-    wsServer,
-  ],
+  }
 });
