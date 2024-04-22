@@ -1,5 +1,4 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-import wsServer from './server/middleware/wsServer'
 export default defineNuxtConfig({
   devtools: { enabled: true },
   build: {
@@ -13,6 +12,11 @@ export default defineNuxtConfig({
       })
     },
   ],
+  nitro: {
+    experimental: {
+      websocket: true
+    }
+  },
   vite: {
     vue: {
       template: {
