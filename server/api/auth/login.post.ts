@@ -40,15 +40,6 @@ export default defineEventHandler(async (event) => {
         { expiresIn: '24h' } // Options
     );
 
-    // Optionnellement, vous pouvez envoyer le token dans un cookie HTTPS sécurisé
-    setCookie(event, 'authToken', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 60 * 60 * 24 // 24 heures
-    });
-
     return {
         message: "Connexion réussie",
         token, // Renvoyer le token au client
