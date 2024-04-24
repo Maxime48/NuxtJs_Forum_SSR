@@ -10,6 +10,11 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { email, password } = body;
 
+    // Vérifier si le paramètres sont fournis
+    if (!email || !password) {
+        throw new Error('Veuillez fournir un email et un mot de passe.');
+    }
+
     // Trouver l'utilisateur par email
     const user = await prisma.user.findUnique({
         where: {
