@@ -21,6 +21,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Message   Message[]
+  Admin     Boolean   @default(false)
 }
 
 model Forum {
