@@ -11,11 +11,21 @@ interface AuthState {
 }
 
 export const useAuthStore = defineStore('auth', {
+    persist: true,
     state: (): AuthState => ({
         token: null,
         user: null,
         message: null
     }),
+    getters: {
+        getMessage: (state) =>{
+            //set timeout for message 5 seconds
+            setTimeout(() => {
+                state.message = null
+            }, 5000)
+            return state.message
+        },
+    },
     actions: {
         async login(credentials: { email: string, password: string }) {
             try {
@@ -27,11 +37,13 @@ export const useAuthStore = defineStore('auth', {
                     body: JSON.stringify(credentials)
                 })
                 if (!response.ok) {
+                    this.message = (await response.json()).message
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json()
                 this.token = data.token
                 this.user = data.user
+                this.message = data.message
                 console.log(data)
             } catch (error) {
                 console.error(error)
@@ -47,10 +59,13 @@ export const useAuthStore = defineStore('auth', {
                     body: JSON.stringify(credentials)
                 })
                 if (!response.ok) {
+                    this.message = (await response.json()).message
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json()
-                this.user = data
+                this.token = data.token
+                this.user = data.user
+                this.message = data.message
             } catch (error) {
                 console.error(error)
             }

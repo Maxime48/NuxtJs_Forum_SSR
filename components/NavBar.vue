@@ -1,13 +1,9 @@
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/authStore'
+
+const authStore = useAuthStore()
 const sidebar = ref(false);
-const menuItems = ref([
-  { title: 'Accueil', icon: 'mdi-home', path: '/' },
-  { title: 'Catégories', icon: 'mdi-format-list-bulleted', path: '/categories' },
-  { title: 'Nouveaux sujets', icon: 'mdi-plus-box', path: '/new-topics' },
-  { title: 'Mon profil', icon: 'mdi-account', path: '/profile' },
-  { title: 'Login', icon: 'mdi-login', path: '/auth/login' }, // Ajouté
-  { title: 'Register', icon: 'mdi-account-plus', path: '/auth/register' }, // Ajouté
-]);
+
 </script>
 
 <template>
@@ -19,14 +15,27 @@ const menuItems = ref([
       </router-link>
     </v-app-bar-title>
     <v-spacer />
-    <v-btn
-        v-for="item in menuItems"
-        :key="item.title"
-        :to="item.path"
-        class="hidden-xs-only"
-    >
-      <v-icon left>{{ item.icon }}</v-icon>
-      {{ item.title }}
+    <v-btn :to="'/'" class="hidden-xs-only">
+      <v-icon left>mdi-home</v-icon>
+      Accueil
     </v-btn>
+    <v-btn v-if="authStore.user" :to="'/profile'" class="hidden-xs-only">
+      <v-icon left>mdi-account</v-icon>
+      {{ authStore.user.name }}
+    </v-btn>
+    <v-btn v-if="authStore.user" :to="'/'" class="hidden-xs-only" @click="authStore.logout()">
+      <v-icon left>mdi-logout</v-icon>
+      Logout
+    </v-btn>
+    <div v-else >
+      <v-btn :to="'/auth/login'" class="hidden-xs-only">
+        <v-icon left>mdi-login</v-icon>
+        Login
+      </v-btn>
+      <v-btn :to="'/auth/register'" class="hidden-xs-only">
+        <v-icon left>mdi-account-plus</v-icon>
+        Register
+      </v-btn>
+    </div>
   </v-app-bar>
 </template>
