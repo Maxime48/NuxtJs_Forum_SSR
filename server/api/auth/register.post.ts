@@ -54,6 +54,7 @@ export default defineEventHandler(async (event) => {
             id: newUser.id,
             email: newUser.email,
             name: newUser.name,
+            Admin: newUser.Admin,
         },
     };
 });

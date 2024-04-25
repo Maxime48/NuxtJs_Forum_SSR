@@ -8,6 +8,7 @@ const sidebar = ref(false);
 
 <template>
   <v-app-bar app>
+
     <v-app-bar-nav-icon class="hidden-sm-and-up" @click="sidebar = !sidebar" />
     <v-app-bar-title>
       <router-link to="/" class="text-decoration-none">
@@ -15,6 +16,20 @@ const sidebar = ref(false);
       </router-link>
     </v-app-bar-title>
     <v-spacer />
+
+    <div v-if="useRoute().path.startsWith('/admin')">
+      <v-btn :to="'/admin/forum'" class="hidden-xs-only">
+        <v-icon left>mdi-forum</v-icon>
+        Forum
+      </v-btn>
+    </div>
+    <div v-else>
+      <v-btn v-if="useAuthStore().user?.Admin" :to="'/admin/'" class="hidden-xs-only">
+        <v-icon left>mdi-security</v-icon>
+        Admin
+      </v-btn>
+    </div>
+
     <v-btn :to="'/'" class="hidden-xs-only">
       <v-icon left>mdi-home</v-icon>
       Accueil
@@ -33,9 +48,10 @@ const sidebar = ref(false);
         Login
       </v-btn>
       <v-btn :to="'/auth/register'" class="hidden-xs-only">
-        <v-icon left>mdi-account-plus</v-icon>
+        <v-icon left>mdi-account-circle</v-icon>
         Register
       </v-btn>
     </div>
+
   </v-app-bar>
 </template>

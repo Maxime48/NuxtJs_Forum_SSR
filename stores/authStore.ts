@@ -6,6 +6,7 @@ interface AuthState {
         id: number
         email: string
         name: string
+        Admin: boolean
     } | null
     message: string | null
 }
@@ -44,7 +45,6 @@ export const useAuthStore = defineStore('auth', {
                 this.token = data.token
                 this.user = data.user
                 this.message = data.message
-                console.log(data)
             } catch (error) {
                 console.error(error)
             }
