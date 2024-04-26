@@ -9,7 +9,7 @@
       <template v-slot:item="{ item }">
         <tr>
           <td>
-            <v-btn :to="'/forum/'+useRoute().params.id+'/' + item.id">
+            <v-btn :to="'/forum/'+useRoute().params.id+'/view/' + item.id">
               {{ item.title }}
             </v-btn>
           </td>

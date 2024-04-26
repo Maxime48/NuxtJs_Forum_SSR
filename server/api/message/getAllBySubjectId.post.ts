@@ -9,9 +9,17 @@ export default defineEventHandler(async (event) => {
     if (!id) {
         throw new Error('ID is required');
     }
-    const message = await prisma.message.findUnique({
+    const message = await prisma.message.findMany({
         where: {
-            id: Number(id),
+            subjectId: Number(id),
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            }
         },
     });
     return message;
