@@ -57,9 +57,9 @@ export default defineComponent({
     const menu = ref<boolean[]>([])
 
     const headers = [
-      { text: 'Title', value: 'title' },
-      { text: 'Description', value: 'description' },
-      { text: 'Actions', value: 'action', sortable: false },
+      { title: 'Title', value: 'title' },
+      { title: 'Description', value: 'description' },
+      { title: 'Actions', value: 'action', sortable: false },
     ]
 
     onMounted(async () => {

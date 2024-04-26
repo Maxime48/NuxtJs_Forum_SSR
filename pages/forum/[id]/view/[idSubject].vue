@@ -93,7 +93,7 @@ export default {
     const ws = ref<WebSocket>()
 
     const headers = [
-      { text: 'Content', value: 'content' }
+      { title: '', value: 'content' }
     ]
 
     const fetchMessages = async () => {

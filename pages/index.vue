@@ -14,6 +14,7 @@
             </v-btn>
           </td>
           <td>{{ item.description }}</td>
+          <td>{{ item._count.subjects }}</td>
         </tr>
       </template>
     </v-data-table>
@@ -22,16 +23,17 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue'
 import { useForumStore } from '~/stores/forumStore'
-import type { Forum } from "@prisma/client";
+import type {ForumWithSubjectCount} from "~/server/types";
 
 export default defineComponent({
   setup() {
     const forumStore = useForumStore()
-    const forums = ref<Forum[]>([])
+    const forums = ref<ForumWithSubjectCount[]>([])
 
     const headers = [
-      { text: 'Title', value: 'title' },
-      { text: 'Description', value: 'description' }
+      { title: 'Title', value: 'title' },
+      { title: 'Description', value: 'description' },
+      { title: 'Subjects', value: '_count.subjects' }
     ]
 
     onMounted(async () => {

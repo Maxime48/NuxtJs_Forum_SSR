@@ -91,8 +91,8 @@ export default {
     const ws = ref<WebSocket>()
 
     const headers = [
-      { text: 'Title', value: 'title' },
-      { text: 'Date', value: 'date' }
+      { title: 'Title', value: 'title' },
+      { title: 'Date', value: 'date' }
     ]
 
     const fetchSubjects = async () => {

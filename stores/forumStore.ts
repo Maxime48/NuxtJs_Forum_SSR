@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import type {Forum} from "@prisma/client";
+import type {ForumWithSubjectCount} from "~/server/types";
 
 
 
 interface ForumState {
-    forums: Forum[]
+    forums: ForumWithSubjectCount[]
     message: string | null
 }
 
