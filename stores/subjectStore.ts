@@ -75,9 +75,31 @@ export const useSubjectStore = defineStore('subject', {
                     this.message = (await response.json()).message
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json()
-                this.subjects = this.subjects.filter(subject => subject.id !== data.id)
+                await response.json()
+                this.subjects = this.subjects.filter(
+                    subject => subject.id !== id
+                )
                 this.message = 'Subject deleted successfully'
+            } catch (error) {
+                console.error(error)
+            }
+        },
+        async updateSubject(id: number, title: string) {
+            try {
+                const response = await fetch('/api/subject/update', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({id, title})
+                })
+                if (!response.ok) {
+                    this.message = (await response.json()).message
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json()
+                this.subjects = this.subjects.map(subject => subject.id === data.id ? data : subject)
+                this.message = 'Subject updated successfully'
             } catch (error) {
                 console.error(error)
             }

@@ -34,7 +34,7 @@
         class="elevation-1"
         item-key="id"
     >
-      <template v-slot:item="{ item }">
+      <template v-slot:item="{ item, index }">
         <tr>
           <td>
             <v-btn :to="'/forum/'+useRoute().params.id+'/view/' + item.id">
@@ -42,6 +42,29 @@
             </v-btn>
           </td>
           <td>{{ item.updatedAt.toLocaleString() }}</td>
+          <td v-if="useAuthStore()?.user?.Admin">
+            <v-icon small @click="toggleItem(index)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteItem(item)">
+              mdi-delete
+            </v-icon>
+          </td>
+        </tr>
+        <tr v-if="menu[index] && useAuthStore()?.user?.Admin" :key="`details-${index}`">
+          <td colspan="4">
+            <v-card v-model="menu[index]" multiple class="v-card--outlined">
+              <v-card-title>
+                Edit Subject
+              </v-card-title>
+              <v-card-text>
+                <v-text-field label="Title" v-model="item.title"></v-text-field>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="blue darken-1" @click="editItem(item, index)">Save</v-btn>
+              </v-card-actions>
+            </v-card>
+          </td>
         </tr>
       </template>
     </v-data-table>
@@ -64,6 +87,7 @@ export default {
     const dialog = ref(false)
     const valid = ref(false)
     const newSubject = ref({ title: '', firstMessage: '' })
+    const menu = ref<boolean[]>([])
 
     const headers = [
       { text: 'Title', value: 'title' },
@@ -86,9 +110,30 @@ export default {
       }
     }
 
+    const toggleItem = (index: number) => {
+      menu.value[index] = !menu.value[index] // Toggle le menu
+    }
+
+    const editItem = async (item: Subject, index: number) => {
+      try {
+        await subjectStore.updateSubject(item.id, item.title)
+        toggleItem(index) // Ferme le menu après la mise à jour
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const deleteItem = async (item: Subject) => {
+      try {
+        await subjectStore.deleteSubject(item.id)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     onMounted(fetchSubjects)
 
-    return { subjects, fetchSubjects, headers, dialog, valid, newSubject, addSubject }
+    return { subjects, fetchSubjects, headers, dialog, valid, newSubject, addSubject, menu, toggleItem, editItem, deleteItem }
   }
 }
 </script>

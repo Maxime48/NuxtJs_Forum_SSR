@@ -13,6 +13,9 @@
     <v-alert class="mb-4" v-if="useSubjectStore().message" type="info" >
       {{ useSubjectStore().getMessage }}
     </v-alert>
+    <v-alert class="mb-4" v-if="useMessageStore().message" type="info" >
+      {{ useMessageStore().getMessage }}
+    </v-alert>
 
     <slot />
   </div>

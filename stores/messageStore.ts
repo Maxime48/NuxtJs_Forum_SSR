@@ -35,6 +35,9 @@ export const useMessageStore = defineStore('message', {
         },
         async addMessage(newMessage: { userId: number | undefined; content: string; subjectId: number }) {
             try {
+                if(!newMessage.userId){
+                    throw new Error('User not logged in')
+                }
                 const response = await fetch('/api/message/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -52,7 +55,7 @@ export const useMessageStore = defineStore('message', {
                 this.messages.push(messageWithUser)
             } catch (error) {
                 console.error(error)
-                this.message = 'Failed to add message, please log in if not.'
+                this.message = 'Failed to add a message, please log in if you are not currently logged in'
             }
         },
         async deleteMessage(id: number) {
