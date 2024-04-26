@@ -9,12 +9,40 @@ export default defineEventHandler(async (event) => {
     if (!id) {
         throw new Error('ID is required');
     }
-    const subject = await prisma.subject.findMany({
-            where: {
-                forumId: Number(id),
+    const subjects = await prisma.subject.findMany({
+        where: {
+            forumId: Number(id),
+        },
+        include: {
+            messages: {
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                take: 1,
+                select: {
+                    content: true,
+                    createdAt: true,
+                    user: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
             }
         },
-    );
+    });
 
-    return subject;
+    // Sort subjects by the createdAt of the last message
+    subjects.sort((a, b) => {
+        const aLastMessage = a.messages[0];
+        const bLastMessage = b.messages[0];
+
+        if (!aLastMessage || !bLastMessage) {
+            return 0;
+        }
+
+        return bLastMessage.createdAt.getTime() - aLastMessage.createdAt.getTime();
+    });
+
+    return subjects;
 })

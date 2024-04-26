@@ -32,8 +32,15 @@ function broadcast(message: any) {
         console.log('peer ', peer);
         console.log('page ', page);
         console.log('message ', message);
-        if ((message.type === 'newMessage' && page === 'subject') ||
-            (message.type === 'newSubject' && page === 'forum')) {
+        if (
+            (message.type === 'newMessage' &&
+                (
+                    page === 'subject' ||
+                    page === 'forum'
+                )
+            ) ||
+            (message.type === 'newSubject' && page === 'forum')
+        ) {
             peer.send(JSON.stringify(message));
             console.log('sent ', message);
         }

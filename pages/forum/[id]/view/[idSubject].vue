@@ -128,6 +128,7 @@ export default {
       try {
         await messageStore.updateMessage(item.id, item.content)
         toggleItem(index) // Ferme le menu après la mise à jour
+        ws.value?.send(JSON.stringify({ type: 'newMessage', subjectId: Number(useRoute().params.idSubject) }));
       } catch (error) {
         console.error(error)
       }
@@ -136,6 +137,7 @@ export default {
     const deleteItem = async (item: MessageWithUser) => {
       try {
         await messageStore.deleteMessage(item.id)
+        ws.value?.send(JSON.stringify({ type: 'newMessage', subjectId: Number(useRoute().params.idSubject) }));
       } catch (error) {
         console.error(error)
       }

@@ -121,6 +121,7 @@ export default {
       try {
         await subjectStore.updateSubject(item.id, item.title)
         toggleItem(index) // Ferme le menu après la mise à jour
+        ws.value?.send(JSON.stringify({ type: 'newSubject', forumId: item.forumId }));
       } catch (error) {
         console.error(error)
       }
@@ -129,6 +130,7 @@ export default {
     const deleteItem = async (item: Subject) => {
       try {
         await subjectStore.deleteSubject(item.id)
+        ws.value?.send(JSON.stringify({ type: 'newSubject', forumId: item.forumId }));
       } catch (error) {
         console.error(error)
       }
