@@ -91,6 +91,23 @@ export const useMessageStore = defineStore('message', {
                 console.error(error)
                 this.message = 'Failed to update message'
             }
+        },
+        async countMessages() {
+            try {
+                const response = await fetch('/api/message/count', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                if (!response.ok) {
+                    this.message = (await response.json()).message
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json()
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 })

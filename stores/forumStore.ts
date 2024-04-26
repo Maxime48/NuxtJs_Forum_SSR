@@ -107,5 +107,23 @@ export const useForumStore = defineStore('forum', {
                 console.error(error)
             }
         },
+        async countForums() {
+            try {
+                const response = await fetch('/api/forum/count', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                if (!response.ok) {
+                    this.message = (await response.json()).message
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json()
+                return data
+            } catch (error) {
+                console.error(error)
+            }
+        }
     }
 })

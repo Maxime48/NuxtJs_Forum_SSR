@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import {defineStore} from 'pinia'
 import type {Subject} from "@prisma/client";
 
 interface SubjectState {
@@ -120,6 +120,23 @@ export const useSubjectStore = defineStore('subject', {
                 }
                 const data = await response.json()
                 return data
+            } catch (error) {
+                console.error(error)
+            }
+        },
+        async countSubjects() {
+            try {
+                const response = await fetch('/api/subject/count', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                if (!response.ok) {
+                    this.message = (await response.json()).message
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json()
             } catch (error) {
                 console.error(error)
             }
