@@ -1,12 +1,7 @@
 import { defineStore } from 'pinia'
+import type {Forum} from "@prisma/client";
 
-interface Forum {
-    id: number
-    title: string
-    description: string | null
-    createdAt: Date
-    updatedAt: Date
-}
+
 
 interface ForumState {
     forums: Forum[]

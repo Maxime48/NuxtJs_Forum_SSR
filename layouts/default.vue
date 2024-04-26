@@ -7,6 +7,12 @@
     <v-alert class="mb-4" v-if="useAuthStore().message" type="info" >
       {{ useAuthStore().getMessage }}
     </v-alert>
+    <v-alert class="mb-4" v-if="useForumStore().message" type="info" >
+      {{ useForumStore().getMessage }}
+    </v-alert>
+    <v-alert class="mb-4" v-if="useSubjectStore().message" type="info" >
+      {{ useSubjectStore().getMessage }}
+    </v-alert>
 
     <slot />
   </div>

@@ -5,14 +5,16 @@ const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
-    const { id } = body;
+    const {id} = body;
     if (!id) {
         throw new Error('ID is required');
     }
-    const deletedSubject = await prisma.subject.delete({
-        where: {
-            id: Number(id),
+    const subject = await prisma.subject.findMany({
+            where: {
+                forumId: Number(id),
+            }
         },
-    });
-    return deletedSubject;
-});
+    );
+
+    return subject;
+})
