@@ -57,6 +57,7 @@ export const useSubjectStore = defineStore('subject', {
                 const data = await response.json()
                 this.subjects.push(data)
                 this.message = 'Subject added successfully'
+                return data;
             } catch (error) {
                 console.error(error)
             }
