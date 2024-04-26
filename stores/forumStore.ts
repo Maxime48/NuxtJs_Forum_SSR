@@ -69,7 +69,7 @@ export const useForumStore = defineStore('forum', {
         },
         async updateForum(forum: Forum) {
             try {
-                const response = await fetch(`/api/forum/update/${forum.id}`, {
+                const response = await fetch(`/api/forum/update/`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -86,6 +86,28 @@ export const useForumStore = defineStore('forum', {
                     this.forums[index] = data
                 }
                 this.message = 'Forum updated successfully'
+            } catch (error) {
+                console.error(error)
+            }
+        },
+        async deleteForum(id: number) {
+            try {
+                const response = await fetch(`/api/forum/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id })
+                })
+                if (!response.ok) {
+                    this.message = (await response.json()).message
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const index = this.forums.findIndex(f => f.id === id)
+                if (index !== -1) {
+                    this.forums.splice(index, 1)
+                }
+                this.message = 'Forum deleted successfully'
             } catch (error) {
                 console.error(error)
             }
