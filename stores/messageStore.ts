@@ -33,7 +33,7 @@ export const useMessageStore = defineStore('message', {
                 this.message = 'Failed to fetch messages'
             }
         },
-        async addMessage(newMessage: { content: string, subjectId: number, userId: number }) {
+        async addMessage(newMessage: { userId: number | undefined; content: string; subjectId: number }) {
             try {
                 const response = await fetch('/api/message/create', {
                     method: 'POST',
@@ -41,10 +41,18 @@ export const useMessageStore = defineStore('message', {
                     body: JSON.stringify(newMessage),
                 })
                 const addedMessage = await response.json()
-                this.messages.push(addedMessage)
+                //added message plus user from the store
+                const messageWithUser = {
+                    ...addedMessage,
+                    user: {
+                        id: newMessage.userId,
+                        name: useAuthStore().user?.name
+                    }
+                }
+                this.messages.push(messageWithUser)
             } catch (error) {
                 console.error(error)
-                this.message = 'Failed to add message'
+                this.message = 'Failed to add message, please log in if not.'
             }
         },
         async deleteMessage(id: number) {
