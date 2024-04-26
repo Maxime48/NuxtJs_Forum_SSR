@@ -1,23 +1,51 @@
 <template>
   <div>
-    <h1>Subject {{ $route.params.idSubject }}</h1>
+    <h1>Subject " {{ subject?.title }} "</h1>
     <v-data-table
         :headers="headers"
         :items="messages"
-        :items-per-page="20"
         class="elevation-1"
     >
-      <template v-slot:item.content="{ item }">
-        <v-card>
-          <v-card-title>
-            {{ item?.user?.name }} - {{ item.createdAt }}
-          </v-card-title>
-          <v-card-text>
-            {{ item.content }}
-          </v-card-text>
-        </v-card>
+      <template v-slot:item="{ item, index }">
+        <tr>
+          <td>
+            <v-card>
+              <v-card-title>
+                {{ item?.user?.name }} - {{ item.createdAt }}
+              </v-card-title>
+              <v-card-text>
+                {{ item.content }}
+              </v-card-text>
+              <v-card-actions v-if="useAuthStore().user?.Admin || useAuthStore().user?.id === item.userId">
+                <v-icon small @click="toggleItem(index)" :disabled="isOlderThanFiveMinutes(item.createdAt)">
+                  mdi-pencil
+                </v-icon>
+                <v-icon small v-if="useAuthStore().user?.Admin" @click="deleteItem(item)">
+                  mdi-delete
+                </v-icon>
+                <small>{{ getRemainingTime(item.createdAt) }}</small>
+              </v-card-actions>
+            </v-card>
+          </td>
+        </tr>
+        <tr v-if="menu[index] && (useAuthStore().user?.Admin || useAuthStore().user?.id === item.userId)" :key="`details-${index}`">
+          <td colspan="4">
+            <v-card v-model="menu[index]" multiple class="v-card--outlined">
+              <v-card-title>
+                Edit Message
+              </v-card-title>
+              <v-card-text>
+                <v-text-field label="Content" v-model="item.content"></v-text-field>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="blue darken-1" @click="editItem(item, index)">Save</v-btn>
+              </v-card-actions>
+            </v-card>
+          </td>
+        </tr>
       </template>
     </v-data-table>
+
     <v-btn color="primary" dark @click="dialog = true">Add Message</v-btn>
 
     <v-dialog v-model="dialog" max-width="500px">
@@ -47,19 +75,21 @@
 <script lang="ts">
 import { onMounted, ref } from 'vue'
 import { useMessageStore } from '~/stores/messageStore'
-import MessageC from '~/components/Message.vue'
-import type {MessageWithUser} from "~/server/types";
+import { useSubjectStore } from '~/stores/subjectStore'
+import { useAuthStore } from '~/stores/authStore'
+import type { MessageWithUser } from "~/server/types";
+import type {Subject} from "@prisma/client";
 
 export default {
-  components: {
-    MessageC
-  },
   setup() {
+    const subjectStore = useSubjectStore()
     const messageStore = useMessageStore()
-    const messages = ref([{}] as MessageWithUser[])
+    const messages = ref<MessageWithUser[]>([] as MessageWithUser[])
     const dialog = ref(false)
     const valid = ref(false)
     const newMessage = ref({ content: '' })
+    const menu = ref<boolean[]>([])
+    const subject = ref<Subject | null>(null)
 
     const headers = [
       { text: 'Content', value: 'content' }
@@ -67,7 +97,16 @@ export default {
 
     const fetchMessages = async () => {
       await messageStore.fetchMessages(Number(useRoute().params.idSubject))
-      messages.value = messageStore.messages
+      messages.value = messageStore.messages.map(message => ({
+        ...message,
+        remainingTime: getRemainingTime(message.createdAt)
+      }))
+      setInterval(updateRemainingTime, 1000)
+    }
+
+    const fetchSubject = async () => {
+      const id = useRoute().params.idSubject
+      subject.value = await subjectStore.getSubjectById(Number(id))
     }
 
     const addMessage = async () => {
@@ -75,20 +114,65 @@ export default {
         await messageStore.addMessage({ content: newMessage.value.content, subjectId: Number(useRoute().params.idSubject), userId: useAuthStore().user?.id })
         newMessage.value.content = ''
         dialog.value = false
+        await fetchMessages()
       }
     }
 
-    onMounted(fetchMessages)
-
-    return {
-      messages,
-      fetchMessages,
-      headers,
-      dialog,
-      valid,
-      newMessage,
-      addMessage
+    const toggleItem = (index: number) => {
+      menu.value[index] = !menu.value[index] // Toggle le menu
     }
+
+    const editItem = async (item: MessageWithUser, index: number) => {
+      try {
+        await messageStore.updateMessage(item.id, item.content)
+        toggleItem(index) // Ferme le menu après la mise à jour
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const deleteItem = async (item: MessageWithUser) => {
+      try {
+        await messageStore.deleteMessage(item.id)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const isOlderThanFiveMinutes = (date: Date) => {
+      if (useAuthStore().user?.Admin) {
+        return false;
+      }
+      const diff = new Date().getTime() - new Date(date).getTime();
+      return diff > 5 * 60 * 1000; // 5 minutes in milliseconds
+    }
+
+    const updateRemainingTime = () => {
+      messages.value = messages.value.map(message => ({
+        ...message,
+        remainingTime: getRemainingTime(message.createdAt)
+      }))
+    }
+
+    const getRemainingTime = (date: Date) => {
+      const diff = new Date().getTime() - new Date(date).getTime();
+      const remainingSeconds = Math.max(0, Math.ceil((5 * 60 * 1000 - diff) / 1000));
+      return remainingSeconds > 0 ? remainingSeconds : "Edit Timed Out";
+    }
+
+
+    const getRemainingTimePercentage = (date: Date) => {
+      const diff = new Date().getTime() - new Date(date).getTime();
+      const remainingPercentage = Math.max(0, 100 - (diff / (5 * 60 * 1000)) * 100);
+      return remainingPercentage;
+    }
+
+    onMounted(async () => {
+      await fetchSubject()
+      await fetchMessages()
+    })
+
+    return { subject, messages, fetchMessages, headers, dialog, valid, newMessage, addMessage, menu, toggleItem, editItem, deleteItem, isOlderThanFiveMinutes, getRemainingTime, getRemainingTimePercentage }
   }
 }
 </script>

@@ -65,7 +65,11 @@ export const useMessageStore = defineStore('message', {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id }),
                 })
-                this.messages = this.messages.filter(m => m.id !== id)
+                const index = this.messages.findIndex(m => m.id === id)
+                if(index !== -1) {
+                    this.messages.splice(index, 1)
+                }
+                this.message = 'Message deleted successfully'
             } catch (error) {
                 console.error(error)
                 this.message = 'Failed to delete message'
