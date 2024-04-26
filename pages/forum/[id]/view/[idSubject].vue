@@ -73,7 +73,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useMessageStore } from '~/stores/messageStore'
 import { useSubjectStore } from '~/stores/subjectStore'
 import { useAuthStore } from '~/stores/authStore'
@@ -90,6 +90,7 @@ export default {
     const newMessage = ref({ content: '' })
     const menu = ref<boolean[]>([])
     const subject = ref<Subject | null>(null)
+    const ws = ref<WebSocket>()
 
     const headers = [
       { text: 'Content', value: 'content' }
@@ -114,6 +115,7 @@ export default {
         await messageStore.addMessage({ content: newMessage.value.content, subjectId: Number(useRoute().params.idSubject), userId: useAuthStore().user?.id })
         newMessage.value.content = ''
         dialog.value = false
+        ws.value?.send(JSON.stringify({ type: 'newMessage', subjectId: Number(useRoute().params.idSubject) }));
         await fetchMessages()
       }
     }
@@ -168,9 +170,27 @@ export default {
     }
 
     onMounted(async () => {
+      const isSecure = location.protocol === "https:";
+      const url = (isSecure ? "wss://" : "ws://") + location.host + "/_ws";
+      ws.value = new WebSocket(url);
+      ws.value.onopen = () => {
+        ws.value?.send(JSON.stringify({ type: 'page', page: 'subject' }));
+      };
+      ws.value.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'newMessage' && Number(data.subjectId) === Number(useRoute().params.idSubject)) {
+          await fetchMessages();
+        }
+      };
       await fetchSubject()
       await fetchMessages()
     })
+
+    onBeforeUnmount(() => {
+      if (ws.value) {
+        ws.value.close();
+      }
+    });
 
     return { subject, messages, fetchMessages, headers, dialog, valid, newMessage, addMessage, menu, toggleItem, editItem, deleteItem, isOlderThanFiveMinutes, getRemainingTime, getRemainingTimePercentage }
   }

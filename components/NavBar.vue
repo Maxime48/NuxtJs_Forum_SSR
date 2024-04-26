@@ -22,6 +22,10 @@ const sidebar = ref(false);
         <v-icon left>mdi-forum</v-icon>
         Forum
       </v-btn>
+      <v-btn :to="'/admin/access'" class="hidden-xs-only">
+        <v-icon left>mdi-account-key</v-icon>
+        Access
+      </v-btn>
     </div>
     <div v-else>
       <v-btn v-if="useAuthStore().user?.Admin" :to="'/admin/'" class="hidden-xs-only">

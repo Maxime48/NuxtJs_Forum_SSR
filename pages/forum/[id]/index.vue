@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn color="primary" dark @click="dialog = true">Add Subject</v-btn>
+    <v-btn v-if="useAuthStore().user!==null" color="primary" dark @click="dialog = true">Add Subject</v-btn>
 
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
@@ -72,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useSubjectStore } from '~/stores/subjectStore'
 import { useMessageStore } from '~/stores/messageStore'
 import { useAuthStore } from '~/stores/authStore'
@@ -88,6 +88,7 @@ export default {
     const valid = ref(false)
     const newSubject = ref({ title: '', firstMessage: '' })
     const menu = ref<boolean[]>([])
+    const ws = ref<WebSocket>()
 
     const headers = [
       { text: 'Title', value: 'title' },
@@ -107,6 +108,8 @@ export default {
         newSubject.value.title = ''
         newSubject.value.firstMessage = ''
         dialog.value = false
+        ws.value?.send(JSON.stringify({ type: 'newSubject', forumId: subject.forumId }));
+        await fetchSubjects()
       }
     }
 
@@ -131,7 +134,27 @@ export default {
       }
     }
 
-    onMounted(fetchSubjects)
+    onMounted(async () => {
+      const isSecure = location.protocol === "https:";
+      const url = (isSecure ? "wss://" : "ws://") + location.host + "/_ws";
+      ws.value = new WebSocket(url);
+      ws.value.onopen = () => {
+        ws.value?.send(JSON.stringify({type: 'page', page: 'forum'}));
+      };
+      ws.value.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        if ((data.type === 'newSubject' && Number(data.forumId) === Number(useRoute().params.id)) || data.type === 'newMessage' && subjects.value.find(subject => Number(subject.id) === Number(data.subjectId))) {
+          await fetchSubjects();
+        }
+      };
+      await fetchSubjects()
+    })
+
+    onBeforeUnmount(() => {
+      if (ws.value) {
+        ws.value.close();
+      }
+    });
 
     return { subjects, fetchSubjects, headers, dialog, valid, newSubject, addSubject, menu, toggleItem, editItem, deleteItem }
   }

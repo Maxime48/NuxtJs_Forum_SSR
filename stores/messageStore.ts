@@ -53,6 +53,7 @@ export const useMessageStore = defineStore('message', {
                     }
                 }
                 this.messages.push(messageWithUser)
+                return messageWithUser
             } catch (error) {
                 console.error(error)
                 this.message = 'Failed to add a message, please log in if you are not currently logged in'
