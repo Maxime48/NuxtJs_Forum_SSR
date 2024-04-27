@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev --experimental-modules --host",
+    "dev": "npx tsx init.ts && nuxt dev --experimental-modules --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -26,6 +26,8 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/ws": "^8.5.10",
     "prisma": "^5.11.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.3",
     "vite-plugin-vuetify": "^2.0.3",
     "vuetify": "^3.5.12"
   }
