@@ -1,75 +1,26 @@
-# Nuxt 3 Minimal Starter
+# NuxtJs Forum SSR
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A simple forum application built with TypeScript, NuxtJs, Vuetify, mdi, pinia, and prisma.
+
+*Made for learning purposes, contributions are welcome*
+
 
 ## Setup
 
-Make sure to install the dependencies:
+Make sure to install docker, then run the following command to start:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+docker-compose up -d
 ```
 
-## Development Server
+Docker will start to install the dependencies, then the file ```init.ts``` will be executed to create the database and seed it with a default admin user.
 
-Start the development server on `http://localhost:3000`:
+If you want to change the default admin user, you can do it by changing the values in the file ```init.ts``` or later on the ```/profile``` page.
 
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
+Simply go to [http://localhost:3000](http://localhost:3000) to see the application running.
 
 ## Production
 
-Build the application for production:
+Never run it in production, it's not secure at all.
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Instead, try this homemade commercial solution [https://builtbybit.com/resources/laranet.23140/](https://builtbybit.com/resources/laranet.23140/)
