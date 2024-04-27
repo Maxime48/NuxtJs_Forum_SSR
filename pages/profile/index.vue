@@ -4,7 +4,7 @@
       <v-card-title>Change Password</v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid" @submit.prevent="changePassword">
-          <v-text-field v-model="currentPassword" :rules="passwordRules" label="Current Password" type="password" required></v-text-field>
+          <v-text-field v-model="currentPassword" label="Current Password" type="password" required></v-text-field>
           <v-text-field v-model="newPassword" :rules="passwordRules" label="New Password" type="password" required></v-text-field>
           <v-text-field v-model="confirmPassword" :rules="confirmPasswordRules" label="Confirm New Password" type="password" required></v-text-field>
           <v-btn type="submit" :disabled="!valid">Change Password</v-btn>
