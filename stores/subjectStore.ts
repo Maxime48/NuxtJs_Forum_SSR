@@ -1,8 +1,8 @@
 import {defineStore} from 'pinia'
-import type {Subject} from "@prisma/client";
+import type {SubjectWithFirstAndLastMessage} from "~/server/types";
 
 interface SubjectState {
-    subjects: Subject[]
+    subjects: SubjectWithFirstAndLastMessage[]
     message: string | null
 }
 

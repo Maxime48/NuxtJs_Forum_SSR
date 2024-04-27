@@ -41,7 +41,12 @@
               {{ item.title }}
             </v-btn>
           </td>
-          <td>{{ item.updatedAt.toLocaleString() }}</td>
+          <td>{{ item.firstMessage.user.name }}</td>
+          <td>{{ timeAgo(item.updatedAt) }}</td>
+          <td>
+            {{ item.lastMessage.user.name }} -
+            {{ timeAgo(item.lastMessage.createdAt) }}
+          </td>
           <td v-if="useAuthStore()?.user?.Admin">
             <v-icon small @click="toggleItem(index)">
               mdi-pencil
@@ -76,14 +81,14 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useSubjectStore } from '~/stores/subjectStore'
 import { useMessageStore } from '~/stores/messageStore'
 import { useAuthStore } from '~/stores/authStore'
-import type { Subject } from "@prisma/client";
+import type {SubjectWithFirstAndLastMessage} from "~/server/types";
 
 export default {
   setup() {
     const subjectStore = useSubjectStore()
     const messageStore = useMessageStore()
     const authStore = useAuthStore()
-    const subjects = ref<Subject[]>([] as Subject[])
+    const subjects = ref<SubjectWithFirstAndLastMessage[]>([] as SubjectWithFirstAndLastMessage[])
     const dialog = ref(false)
     const valid = ref(false)
     const newSubject = ref({ title: '', firstMessage: '' })
@@ -92,7 +97,9 @@ export default {
 
     const headers = [
       { title: 'Title', value: 'title' },
-      { title: 'Date', value: 'date' }
+      { title: 'Author', value: 'firstMessage.user.name' },
+      { title: 'Date', value: 'updatedAt' },
+      { title: 'Last Messsage', value: 'lastMessage.createdAt' }
     ]
 
     const fetchSubjects = async () => {
@@ -117,7 +124,7 @@ export default {
       menu.value[index] = !menu.value[index] // Toggle le menu
     }
 
-    const editItem = async (item: Subject, index: number) => {
+    const editItem = async (item: SubjectWithFirstAndLastMessage, index: number) => {
       try {
         await subjectStore.updateSubject(item.id, item.title)
         toggleItem(index) // Ferme le menu après la mise à jour
@@ -127,7 +134,7 @@ export default {
       }
     }
 
-    const deleteItem = async (item: Subject) => {
+    const deleteItem = async (item: SubjectWithFirstAndLastMessage) => {
       try {
         await subjectStore.deleteSubject(item.id)
         ws.value?.send(JSON.stringify({ type: 'newSubject', forumId: item.forumId }));
@@ -158,7 +165,29 @@ export default {
       }
     });
 
-    return { subjects, fetchSubjects, headers, dialog, valid, newSubject, addSubject, menu, toggleItem, editItem, deleteItem }
+    const timeAgo = (date: any) => {
+      const now = new Date();
+      date = new Date(date)
+      const secondsPast = (now.getTime() - date.getTime()) / 1000;
+
+      if(secondsPast < 60){
+        return parseInt(String(secondsPast)) + ' seconds ago';
+      }
+      if(secondsPast < 3600){
+        return parseInt(String(secondsPast / 60)) + ' minutes ago';
+      }
+      if(secondsPast <= 86400){
+        return parseInt(String(secondsPast / 3600)) + ' hours ago';
+      }
+      if(secondsPast > 86400){
+        const day = date.getDate();
+        const month = date.toDateString().match(/ [a-zA-Z]*/)![0].replace(" ","");
+        const year = date.getFullYear() == now.getFullYear() ? "" :  " "+date.getFullYear();
+        return day + " " + month + year;
+      }
+    }
+
+    return { timeAgo, subjects, fetchSubjects, headers, dialog, valid, newSubject, addSubject, menu, toggleItem, editItem, deleteItem }
   }
 }
 </script>

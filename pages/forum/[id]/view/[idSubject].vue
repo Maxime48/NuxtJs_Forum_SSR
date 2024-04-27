@@ -11,7 +11,7 @@
           <td>
             <v-card>
               <v-card-title>
-                {{ item?.user?.name }} - {{ item.createdAt }}
+                {{ item?.user?.name }} - {{ timeAgo(item.createdAt) }}
               </v-card-title>
               <v-card-text>
                 {{ item.content }}
@@ -194,7 +194,29 @@ export default {
       }
     });
 
-    return { subject, messages, fetchMessages, headers, dialog, valid, newMessage, addMessage, menu, toggleItem, editItem, deleteItem, isOlderThanFiveMinutes, getRemainingTime, getRemainingTimePercentage }
+    const timeAgo = (date: any) => {
+      const now = new Date();
+      date = new Date(date)
+      const secondsPast = (now.getTime() - date.getTime()) / 1000;
+
+      if(secondsPast < 60){
+        return parseInt(String(secondsPast)) + ' seconds ago';
+      }
+      if(secondsPast < 3600){
+        return parseInt(String(secondsPast / 60)) + ' minutes ago';
+      }
+      if(secondsPast <= 86400){
+        return parseInt(String(secondsPast / 3600)) + ' hours ago';
+      }
+      if(secondsPast > 86400){
+        const day = date.getDate();
+        const month = date.toDateString().match(/ [a-zA-Z]*/)![0].replace(" ","");
+        const year = date.getFullYear() == now.getFullYear() ? "" :  " "+date.getFullYear();
+        return day + " " + month + year;
+      }
+    }
+
+    return { timeAgo, subject, messages, fetchMessages, headers, dialog, valid, newMessage, addMessage, menu, toggleItem, editItem, deleteItem, isOlderThanFiveMinutes, getRemainingTime, getRemainingTimePercentage }
   }
 }
 </script>
